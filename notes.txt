@@ -1,0 +1,8 @@
+
+
+mkdir svg-viewer
+cd svg-viewer
+npm init
+npm install --save jquery
+npm install --save-dev electron
+
