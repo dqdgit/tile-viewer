@@ -58,13 +58,13 @@ function createWindow() {
   //   o "win32" - Windows
   //   o "linux" - Linux
 
-  //const appIcon = new Tray(path.join(__dirname, 's-2-48.png'))
+  //const appIcon = new Tray(path.join(__dirname, 's-2-1024.png'))
 
   win = new BrowserWindow({ 
     width: 800, 
     height: 500,
     title: "Tile Viewer",
-    icon: path.join(__dirname, 'assets/s-2-48.png')
+    icon: path.join(__dirname, 'assets/s-2-1024.png')
   })
 
   // and load the index.html of the app.
