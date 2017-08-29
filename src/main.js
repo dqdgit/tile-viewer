@@ -64,7 +64,7 @@ function createWindow() {
     width: 800, 
     height: 500,
     title: "Tile Viewer",
-    icon: path.join(__dirname, 's-2-48.png')
+    icon: path.join(__dirname, 'assets/s-2-48.png')
   })
 
   // and load the index.html of the app.
@@ -159,7 +159,7 @@ function clearTiles() {
 
   // Create the URL for the default tile image
   let fileUrl = url.format({
-    pathname: path.join(__dirname, 'no-tile-loaded.svg'),
+    pathname: path.join(__dirname, 'assets/no-tile-loaded.svg'),
     protocol: 'file',
     slashes: true
   })
