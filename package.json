@@ -5,50 +5,21 @@
   "main": "src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make"
+    "start": "./node_modules/.bin/electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
   },
   "author": "David Dunn",
   "license": "ISC",
   "dependencies": {
-    "electron-compile": "^6.4.1",
     "jquery": "^3.2.1"
   },
   "devDependencies": {
-    "babel-plugin-transform-async-to-generator": "^6.24.1",
-    "babel-preset-env": "^1.6.0",
-    "babel-preset-react": "^6.24.1",
-    "electron-forge": "^3.2.0",
-    "electron-prebuilt-compile": "1.7.5"
+    "electron": "^1.7.5",
+    "electron-builder": "^19.26.3"
   },
-  "config": {
-    "forge": {
-      "make_targets": {
-        "win32": [
-          "squirrel"
-        ],
-        "darwin": [
-          "zip"
-        ],
-        "linux": [
-          "deb",
-          "rpm"
-        ]
-      },
-      "electronPackagerConfig": {},
-      "electronWinstallerConfig": {
-        "name": ""
-      },
-      "electronInstallerDebian": {},
-      "electronInstallerRedhat": {},
-      "github_repository": {
-        "owner": "",
-        "name": ""
-      },
-      "windowsStoreConfig": {
-        "packageName": ""
-      }
-    }
+  "build": {
+    "appId": "com.goaltroll.tileviewer"
   }
 }
