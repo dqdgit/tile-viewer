@@ -6,3 +6,12 @@ npm init
 npm install --save jquery
 npm install --save-dev electron
 
+##
+## Electron Builder
+##
+## github: https://github.com/electron-userland/electron-builder
+##
+yarn add electron-builder --dev                 # Add electron-builder to project
+node_modules/.bin/electron-builder              # Build distribution for host platform (Linux)
+node_modules/.bin/electron-builder --win --x64  # Build distribution for Winddows from Linux
+

@@ -80,13 +80,26 @@
                 <td>Keywords</td>
                 <td id="svg_keywords">
                   <textarea id="keywords_input" type="text" data-value="" data-index="" value="" rows="4"></textarea>
-                  <button id="keywords_button">Save</button>
+                  <button id="keywords_save" class="keywords-button">Save</button>
+                  <button id="keywords_cancel" class="keywords-button">Cancel</button>
                 </td>
               </tr>
             </tbody>
           </table>
         </div> <!-- /svg-details -->
       </div> <!-- /svg-container -->
+
+      <div id="status_bar">
+        <div id="status_left" class="status-area">
+          Loaded: 0
+        </div>
+        <div id="status_middle" class="status-area">
+          0 of 0
+        </div>
+        <div id="status_right" class="status-area">
+          Tiles: 0
+        </div>
+      </div>
 
       <script src="index.js"></script>
   </body>

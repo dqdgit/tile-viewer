@@ -198,18 +198,51 @@ ipcRenderer.on('clear-tile', (event, fileUrl) => {
 })
 
 /**
+ * 
+ */
+ipcRenderer.on('status-message', (event, message, area) => {
+  var statusArea;
+  switch(area) {
+    case 'left':
+      statusArea = $("#status_left")
+      break;
+
+    case 'middle':
+      statusArea = $("#status_middle")
+      break;
+
+    case 'right':
+      statusArea = $("#status_right")
+      break;
+
+    default:
+      statusArea = $("#status-left")
+  }
+
+  statusArea.text(message)
+})
+
+/**
  * Click handler for the save keywords button. Update the keywords
  * in the current SVG document, serialize it and send it to the
  * server.
  */
-$("#keywords_button").on("click", () => {
+$("#keywords_save").on("click", () => {
   let idx = $("#keywords_input").attr("data-index")
 
-  if (shownXml && idx !== "") {
+  if (shownXML && idx !== "") {
     let keywords = $("#keywords_input").val()
     let updatedDoc = updateKeywords(shownXML, keywords)
     let data = new XMLSerializer().serializeToString(updatedDoc)
     ipcRenderer.send('update-tile', idx, data)
+  }
+})
+
+$("#keywords_cancel").on("click", () => {
+  let idx = $("#keywords_input").attr("data-index")
+
+  if (shownXML && idx !== "") {
+    ipcRenderer.send('resend-tile', idx)
   }
 })
 

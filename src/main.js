@@ -26,21 +26,21 @@ const template = [
           selectFolders();
         }
       },
-      {
-        type: 'separator'
-      },
+      { type: 'separator' },
       {
         label: 'Close all',
         click(item, focusWindow, event) {
           clearTiles()
         }
       },
-      {
-        type: 'separator'
-      },
-      {
-        role: 'quit'
-      }
+      { type: 'separator' },
+      { role: 'quit' }
+    ]
+  },
+  {
+    label: 'View',
+    submenu: [
+      { role: 'toggledevtools'}
     ]
   }
 ]
@@ -62,7 +62,7 @@ function createWindow() {
 
   win = new BrowserWindow({ 
     width: 800, 
-    height: 500,
+    height: 520,
     title: "Tile Viewer",
     icon: path.join(__dirname, 'assets/s-2-1024.png')
   })
@@ -119,6 +119,10 @@ app.on('activate', () => {
   }
 })
 
+function statusMessage(message, area) {
+  contents.send('status-message', message, area)
+}
+
 /**
  * Load and append the given list of the tile file paths to the tiles
  * array.
@@ -148,6 +152,7 @@ function showTile(idx) {
     ctime: stats.ctime.toISOString()
   }
   contents.send('show-tile', idx, tiles[idx].data, fileUrl, JSON.stringify(fileStats))
+  statusMessage(`Showing: ${idx + 1} of ${tiles.length}`, "middle")
 }
 
 /**
@@ -166,6 +171,9 @@ function clearTiles() {
   
   // Send the clear all message to the client
   contents.send('clear-tile', fileUrl);
+  statusMessage('Loaded: 0', "left")
+  statusMessage('0 of 0', "middle")
+  statusMessage('Tiles: 0', "right")
 }
 
 /**
@@ -173,24 +181,30 @@ function clearTiles() {
  * zero or more SVG files to be loaded.
  */
 function selectFiles() {
-  dialog.showOpenDialog({filters: [{name: 'svg', extensions: ['svg']}],
-                        properties: ['openFile', 'multiSelections']},
-                        function (filePaths) {
-    if (filePaths === undefined) {
-      console.log("No files selected");
-    } else {
-      let numTiles = tiles.length
-      loadTiles(filePaths);
-      // If new tiles were added then update the display.
-      // Always show the first tile in the set just loaded
-      if (tiles.length > numTiles) {
-        let idx = (numTiles > 0) ? numTiles : 0
-        showTile(idx);
-      } else {
-        console.log("No tiles were added")
+  dialog.showOpenDialog({
+    filters: [{name: 'svg', extensions: ['svg']}],
+    properties: ['openFile', 'multiSelections']},
+    function (filePaths) {
+      if (filePaths !== undefined) {
+        let numTiles = tiles.length
+        loadTiles(filePaths);
+        // If new tiles were added then update the display.
+        // Always show the first tile in the set just loaded
+        if (tiles.length > numTiles) {
+          let idx = (numTiles > 0) ? numTiles : 0
+          showTile(idx);
+          statusMessage(`Loaded: ${tiles.length - numTiles}`, "left")
+          statusMessage(`Tiles: ${tiles.length}`, "right")
+        } else {
+          dialog.showMessageBox({
+            type: "info",
+            title: "Informational",
+            message: "No tiles were added",
+            buttons: ["OK"]
+          })
+        }
       }
-    }
-  });
+    });
 }
 
 /**
@@ -223,10 +237,8 @@ function getFilePaths(dirPath, filePaths) {
 function selectFolders() {
   dialog.showOpenDialog({properties: ['openDirectory']},
     function (folderPaths) {
-      if (folderPaths === undefined) {
-        console.log("No folders selected");
-      } else {
-        console.log("folderPaths: " + folderPaths.length)
+      if (folderPaths !== undefined) {
+        //console.log("folderPaths: " + folderPaths.length)
         let numTiles = tiles.length
         for (let folderPath of folderPaths) {
           let filePaths = getFilePaths(folderPath, null)
@@ -237,8 +249,16 @@ function selectFolders() {
         if (tiles.length > numTiles) {
           let idx = (numTiles > 0) ? numTiles : 0
           showTile(idx);
+          statusMessage(`Loaded: ${tiles.length - numTiles}`, "left")
+          statusMessage(`Tiles: ${tiles.length}`, "right")
         } else {
-          console.log("No tiles were added")
+          dialog.showMessageBox({
+            type: "info",
+            title: "Informational",
+            message: "No tiles were added",
+            buttons: ["OK"]
+          })
+
         }
       }
     });  
@@ -248,7 +268,7 @@ function selectFolders() {
  * Generic handler for client response message
  */
 ipcMain.on('client-response', (event, arg) => {
-  console.log("client-response: " + arg);
+  //console.log("client-response: " + arg);
 })
 
 /**
@@ -263,8 +283,16 @@ ipcMain.on('update-tile', (event, idx, data) => {
     try {
       fs.writeFileSync(tile.path, data, {encoding: 'utf8'})
       tile.data = data
+      dialog.showMessageBox({
+        type: "info", 
+        title: "Success",
+        message: `Keywords successfully updated for: ${tile.path}`,
+        buttons: ["OK"]
+      })
     } catch (err) {
-      console.log('ERROR: ' + err)
+      dialog.showErrorBox("Error", 
+      `An error occurred while trying to update the keywords for: ${tile.path}.` +
+      `Error: ${err}`)
     }
   }
 })
@@ -288,5 +316,15 @@ ipcMain.on('next-tile', (event, idx) => {
   idx = parseInt(idx)
   if (idx < (tiles.length - 1)) {
     showTile(idx + 1)
+  }
+})
+
+/**
+ * 
+ */
+ipcMain.on('resend-tile', (event, idx) => {
+  idx = parseInt(idx)
+  if (idx >= 0 && idx < (tiles.length)) {
+    showTile(idx)
   }
 })

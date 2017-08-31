@@ -1,6 +1,6 @@
 {
   "name": "tile-viewer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Desktop application for reviewing Goal Troll tiles",
   "main": "src/main.js",
   "scripts": {
@@ -20,6 +20,14 @@
     "electron-builder": "^19.26.3"
   },
   "build": {
-    "appId": "com.goaltroll.tileviewer"
+    "appId": "com.goaltroll.tileviewer",
+    "productName": "tileviewer",
+    "win": {
+      "icon": "src/assets/tile-tracker-icons.ico"
+    },
+    "linux": {
+      "icon": "src/assets",
+      "category": "Education"
+    }
   }
 }
