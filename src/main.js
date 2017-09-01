@@ -42,6 +42,17 @@ const template = [
     submenu: [
       { role: 'toggledevtools'}
     ]
+  },
+  {
+    label: 'Help',
+    submenu: [
+      {
+        label: 'About',
+        click(item, focusWindow, event) {
+          showAbout()
+        }
+      }
+    ]
   }
 ]
 
@@ -119,8 +130,29 @@ app.on('activate', () => {
   }
 })
 
+/**
+ * Dispay the given message on the application status bar in the 
+ * specified area.
+ * 
+ * @param {String} message - the message to be displayed
+ * @param {String} area - the status bar area in which the
+ *                        message is to be displayed ("left",
+ *                        "middle", "right")
+ */
 function statusMessage(message, area) {
   contents.send('status-message', message, area)
+}
+
+/**
+ * Display the about message box
+ */
+function showAbout() {
+  dialog.showMessageBox({
+    type: "info",
+    title: "About Tile Viewer",
+    message: `Version ${app.getVersion()}`,
+    buttons: ["OK"]
+  })
 }
 
 /**
@@ -171,7 +203,7 @@ function clearTiles() {
   
   // Send the clear all message to the client
   contents.send('clear-tile', fileUrl);
-  statusMessage('Loaded: 0', "left")
+  statusMessage('Added: 0', "left")
   statusMessage('0 of 0', "middle")
   statusMessage('Tiles: 0', "right")
 }
@@ -193,7 +225,7 @@ function selectFiles() {
         if (tiles.length > numTiles) {
           let idx = (numTiles > 0) ? numTiles : 0
           showTile(idx);
-          statusMessage(`Loaded: ${tiles.length - numTiles}`, "left")
+          statusMessage(`Added: ${tiles.length - numTiles}`, "left")
           statusMessage(`Tiles: ${tiles.length}`, "right")
         } else {
           dialog.showMessageBox({
@@ -249,7 +281,7 @@ function selectFolders() {
         if (tiles.length > numTiles) {
           let idx = (numTiles > 0) ? numTiles : 0
           showTile(idx);
-          statusMessage(`Loaded: ${tiles.length - numTiles}`, "left")
+          statusMessage(`Added: ${tiles.length - numTiles}`, "left")
           statusMessage(`Tiles: ${tiles.length}`, "right")
         } else {
           dialog.showMessageBox({
@@ -320,7 +352,8 @@ ipcMain.on('next-tile', (event, idx) => {
 })
 
 /**
- * 
+ * Handler for the "resend-tile" message. Resend the specified
+ * tile data to the client.
  */
 ipcMain.on('resend-tile', (event, idx) => {
   idx = parseInt(idx)
