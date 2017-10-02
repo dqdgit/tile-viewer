@@ -156,17 +156,44 @@ function showAbout() {
 }
 
 /**
+ * See if the tile with the given path is already in the list. Return its
+ * index if it's found or -1 if it is not found.
+ * 
+ * @param {*} filePath 
+ */
+function findTile(filePath) {
+  for (let i = 0; i < tiles.length; i++) {
+    if (tiles[i].path == filePath) {
+      return i;
+    }
+  }
+
+  return -1;
+}
+
+/**
  * Load and append the given list of the tile file paths to the tiles
- * array.
+ * array. Returns the number of tiles reloaded.
  * 
  * @param {Array} filePaths - a list of file path strings
  */
 function loadTiles(filePaths) {
+  let result = { added: 0, reloaded: 0 }
+
   for (let filePath of filePaths) {
     //console.log("file path: " + filePath);
-    let svg = new svgfile(filePath);
-    tiles.push(svg);
+    let idx = findTile(filePath)
+    if (idx == -1) {
+      let svg = new svgfile(filePath);
+      tiles.push(svg);
+      result.added++
+    } else {
+      tiles[idx].reload()
+      result.reloaded++
+    }
   }
+
+  return result
 }
 
 /**
@@ -203,7 +230,7 @@ function clearTiles() {
   
   // Send the clear all message to the client
   contents.send('clear-tile', fileUrl);
-  statusMessage('Added: 0', "left")
+  statusMessage('Added: 0, Reloaded: 0', "left")
   statusMessage('0 of 0', "middle")
   statusMessage('Tiles: 0', "right")
 }
@@ -217,24 +244,19 @@ function selectFiles() {
     filters: [{name: 'svg', extensions: ['svg']}],
     properties: ['openFile', 'multiSelections']},
     function (filePaths) {
+      let numReloaded = 0
       if (filePaths !== undefined) {
         let numTiles = tiles.length
-        loadTiles(filePaths);
+        result = loadTiles(filePaths);
         // If new tiles were added then update the display.
         // Always show the first tile in the set just loaded
-        if (tiles.length > numTiles) {
+        //if (tiles.length > numTiles) {
+        if (result.added > 0) {
           let idx = (numTiles > 0) ? numTiles : 0
           showTile(idx);
-          statusMessage(`Added: ${tiles.length - numTiles}`, "left")
-          statusMessage(`Tiles: ${tiles.length}`, "right")
-        } else {
-          dialog.showMessageBox({
-            type: "info",
-            title: "Informational",
-            message: "No tiles were added",
-            buttons: ["OK"]
-          })
         }
+        statusMessage(`Added: ${result.added}, Reloaded: ${result.reloaded}`, "left")
+        statusMessage(`Tiles: ${tiles.length}`, "right")
       }
     });
 }
@@ -272,26 +294,21 @@ function selectFolders() {
       if (folderPaths !== undefined) {
         //console.log("folderPaths: " + folderPaths.length)
         let numTiles = tiles.length
+        let numReloaded = 0
         for (let folderPath of folderPaths) {
           let filePaths = getFilePaths(folderPath, null)
-          loadTiles(filePaths)
+          result = loadTiles(filePaths)
         }
 
         // Only change the display if new tiles were added
-        if (tiles.length > numTiles) {
+        //if (tiles.length > numTiles) {
+        if (result.added > 0) {
           let idx = (numTiles > 0) ? numTiles : 0
           showTile(idx);
-          statusMessage(`Added: ${tiles.length - numTiles}`, "left")
-          statusMessage(`Tiles: ${tiles.length}`, "right")
-        } else {
-          dialog.showMessageBox({
-            type: "info",
-            title: "Informational",
-            message: "No tiles were added",
-            buttons: ["OK"]
-          })
-
         }
+
+        statusMessage(`Added: ${result.added}, Reloaded: ${result.reloaded}`, "left")
+        statusMessage(`Tiles: ${tiles.length}`, "right")
       }
     });  
 }

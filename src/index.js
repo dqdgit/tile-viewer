@@ -252,14 +252,20 @@ $("#keywords_cancel").on("click", () => {
  * arrow key moves to the next tile (if there is one).
  */
 $(document).on('keyup', (event) => {
-  let idx = $("#keywords_input").attr("data-index")
-  // If no tile is loaded then the value of data-index 
-  // will be the empty string (aka "")
-  if (parseInt(idx) !== NaN) {
-    if (event.keyCode == 37) {       // left arrow
-      ipcRenderer.send('previous-tile', idx)
-    } else if (event.keyCode == 39) {  // right arrow
-      ipcRenderer.send('next-tile', idx)
+  //
+  if ($("#keywords_input").is(":focus")) {
+    return true
+  } else {
+    let idx = $("#keywords_input").attr("data-index")
+    // If no tile is loaded then the value of data-index 
+    // will be the empty string (aka "")
+    if (parseInt(idx) !== NaN) {
+      if (event.keyCode == 37) {       // left arrow
+        ipcRenderer.send('previous-tile', idx)
+      } else if (event.keyCode == 39) {  // right arrow
+        ipcRenderer.send('next-tile', idx)
+      }
     }
+    return false
   }
 })

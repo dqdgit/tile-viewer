@@ -13,6 +13,14 @@ class SvgFile {
       console.log("ERROR: " + err);
     }
   }
+
+  reload() {
+    try {
+      this.data = fs.readFileSync(this.path, 'utf8');
+    } catch (err) {
+      console.log("ERROR: " + err);
+    }    
+  }
 };
 
 module.exports = SvgFile;
